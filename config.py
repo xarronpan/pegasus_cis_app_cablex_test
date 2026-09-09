@@ -3,4 +3,4 @@ locale = "zh-CN"
 check_status = False
 check_invoiced = False
 sync_invoice_with_approval = False
-days_back = 0
+days_back = 1
