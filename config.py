@@ -1,4 +1,4 @@
-appid = "cablex"
+appid = "cablex_test"
 locale = "zh-CN"
 check_status = False
 check_invoiced = False

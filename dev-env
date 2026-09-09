@@ -1,7 +1,7 @@
 #! /bin/bash
 export PEGASUS_CIS_APP_ROOT=$(pwd)
 
-export APPID=cablex
+export APPID=cablex_test
 export PEGASUS_CIS_PREFIX=/service/pegasus_cis
 
 function install_pegasus_cis_app {
