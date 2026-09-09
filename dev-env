@@ -1,0 +1,12 @@
+#! /bin/bash
+export PEGASUS_CIS_APP_ROOT=$(pwd)
+
+export APPID=cablex
+export PEGASUS_CIS_PREFIX=/service/pegasus_cis
+
+function install_pegasus_cis_app {
+  rm ${PEGASUS_CIS_PREFIX}/app/cisapp/${APPID}
+  ln -s ${PEGASUS_CIS_APP_ROOT} ${PEGASUS_CIS_PREFIX}/app/cisapp/${APPID}
+}
+
+conda activate pegasus_cis
