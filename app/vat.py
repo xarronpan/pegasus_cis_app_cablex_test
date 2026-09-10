@@ -58,7 +58,7 @@ class Application(base.Application):
 
         result, text = super().check_order_line(ctx, header, order_line, options)
         doc = self.find_export_declaration_doc_with_cache(ctx)
-        if doc is None:
+        if doc is None or doc["status"] != "submitted":
             return result, text
 
         product_name = self.normalize_text(re.sub(r'^\*.*?\*', '', order_line["product_id"]))
@@ -110,7 +110,7 @@ class Application(base.Application):
         if key in ctx:
             return ctx[key]
 
-        export_declaration_docs = self.find_all_documents("export_declaration", {}, 0, 1, "create_time")
+        export_declaration_docs = self.find_all_documents("export_declaration1", {}, 0, 1, "create_time")
         if len(export_declaration_docs) == 0:
             ctx[key] = None
             return None
