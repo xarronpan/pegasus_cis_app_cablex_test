@@ -27,7 +27,7 @@ class Application(base.Application):
             diagnose["buyer_name"] = diagnose.get("buyer_name","") + "找不到对应的报关单\n"
             diagnose["buyer_tax_id"] = diagnose.get("buyer_tax_id","") + "找不到对应的报关单\n"
         else:
-            doc_content = self.get_export_declaration_doc_content_with_cache(doc["email_id"], doc["filename"], doc["sheet"])
+            doc_content = self.get_export_declaration_doc_content_with_cache(ctx, doc["email_id"], doc["filename"], doc["sheet"])
 
             pre_entry_number = doc_content["header"]["extentions"]["pre_entry_number"]
             if doc["status"] != "submitted":
