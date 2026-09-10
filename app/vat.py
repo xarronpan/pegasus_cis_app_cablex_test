@@ -49,7 +49,7 @@ class Application(base.Application):
                     diagnose["buyer_tax_id"] = diagnose.get("buyer_tax_id","") +\
                         f"购买方识别号 {buyer_tax_id} 与报关单境内发货人代码 {domestic_consignor_code} 不一致, 报关单预录入编码: {pre_entry_number}\n"
 
-        return diagnose, {}
+        return diagnose, match_detail
 
     def check_order_line(self, ctx: dict, header: types.Header, order_line: types.OrderLine, options: str) \
         -> tuple[ str,  # result
