@@ -63,6 +63,7 @@ class Application(base.Application):
 
         product_name = self.normalize_text(re.sub(r'^\*.*?\*', '', order_line["product_id"]))
         specification = self.normalize_text(order_line["extentions"]["specification"])
+        specification = f"|{specification}|"
         quantity = order_line["quantity"]
         unit = order_line["extentions"]["unit"]
         doc_content = self.get_export_declaration_doc_content_with_cache(ctx, doc["email_id"], doc["filename"], doc["sheet"])
