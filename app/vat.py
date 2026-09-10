@@ -110,7 +110,7 @@ class Application(base.Application):
         if key in ctx:
             return ctx[key]
 
-        export_declaration_docs = self.find_all_documents("export_declaration1", {}, 0, 1, "create_time")
+        export_declaration_docs = self.find_all_documents("export_declaration", {}, 0, 1, "create_time")
         if len(export_declaration_docs) == 0:
             ctx[key] = None
             return None
