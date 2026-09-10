@@ -28,15 +28,15 @@ class Application(base.Application):
             diagnose["buyer_tax_id"] = diagnose.get("buyer_tax_id","") + "找不到对应的报关单\n"
         else:
             doc = export_declaration_docs[0]
+            doc_content = self.get_document_invoice_content(doc["email_id"], doc["filename"], doc["sheet"])
+
+            pre_entry_number = doc_content["header"]["extentions"]["pre_entry_number"]
             if doc["status"] != "submitted":
-                pre_entry_number = header["extentions"]["pre_entry_number"]
                 diagnose["buyer_name"] = diagnose.get("buyer_name","") +\
                     f"报关单未提交, 报关单预录入编码: {pre_entry_number}\n"
                 diagnose["buyer_tax_id"] = diagnose.get("buyer_tax_id","") +\
                     f"报关单未提交, 报关单预录入编码: {pre_entry_number}\n"
             else:
-                doc_content = self.get_document_invoice_content(doc["email_id"], doc["filename"], doc["sheet"])
-
                 buyer_name = header["extentions"]["buyer_name"]
                 buyer_tax_id = header["extentions"]["buyer_tax_id"]
                 domestic_consignor = doc_content["header"]["extentions"]["domestic_consignor"]
