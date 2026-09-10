@@ -1,6 +1,7 @@
 import libs.app.types as types
 import libs.app.vat.base as base
 import unicodedata
+import re
 from .. import config
 
 _MAX_PRICE_ERROR = 0.003
@@ -60,7 +61,46 @@ class Application(base.Application):
         if doc is None:
             return result, text
 
-        return "succ", ""
+        product_name = re.sub(r'^\*.*?\*', '', order_line["product_id"])
+        specification = order_line["extentions"]["specification"]
+        quantity = order_line["quantity"]
+        unit = order_line["extentions"]["unit"]
+        doc_content = self.get_export_declaration_doc_content_with_cache(ctx, doc["email_id"], doc["filename"], doc["sheet"])
+
+        for ol in doc_content.order_lines:
+            if ol["checked"]:
+                continue
+
+            product_name_and_specification = ol["desc"]
+            product_name_pos = self.normalize_text(product_name_and_specification).find(self.normalize_text(product_name))
+            if product_name_pos != 0:
+                continue
+
+            if self.normalize_text(product_name_and_specification).\
+                    find(self.normalize_text(specification), product_name_pos + len(self.normalize_text(product_name))) == -1:
+                continue
+
+            qty_and_unit = ol["extentions"]["qty_and_unit"]
+            nums = re.findall(r"\d+(?:\.\d+)?", qty_and_unit)
+
+            found = False
+            for num in nums:
+                if abs(float(num) - quantity == 0):
+                    num_pos = qty_and_unit.find(num)
+                    if qty_and_unit.find(unit, num_pos + len(num)) != -1:
+                        found = True
+                        break
+
+            if not found:
+                continue
+
+            ol["checked"] = True
+
+        if result == "error":
+            pre_entry_number = doc_content["header"]["extentions"]["pre_entry_number"]
+            text += f"报关单中找不到对应行, 报关单预录入编码: {pre_entry_number}\n"
+
+        return "error", result
 
     def find_export_declaration_doc_with_cache(self, ctx):
         key = "export_declaration_doc"
