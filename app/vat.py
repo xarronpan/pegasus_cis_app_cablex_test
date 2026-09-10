@@ -22,12 +22,11 @@ class Application(base.Application):
                  dict[str, str]]:
         diagnose, match_detail = super().check_header(ctx, header, order_lines, options)
 
-        export_declaration_docs = self.find_all_documents("export_declaration", {}, 0, 1, "create_time")
-        if len(export_declaration_docs) == 0:
+        doc = self.find_export_declaration_doc_with_cache(ctx)
+        if doc is None:
             diagnose["buyer_name"] = diagnose.get("buyer_name","") + "找不到对应的报关单\n"
             diagnose["buyer_tax_id"] = diagnose.get("buyer_tax_id","") + "找不到对应的报关单\n"
         else:
-            doc = export_declaration_docs[0]
             doc_content = self.get_document_invoice_content(doc["email_id"], doc["filename"], doc["sheet"])
 
             pre_entry_number = doc_content["header"]["extentions"]["pre_entry_number"]
@@ -56,4 +55,21 @@ class Application(base.Application):
                   str   # diagnose
                 ]:
 
+        result, text = super().check_order_line(ctx, header, order_line, options)
+        doc = self.find_export_declaration_doc_with_cache(ctx)
+        if doc is None:
+            return result, text
+
         return "succ", ""
+
+    def find_export_declaration_doc_with_cache(self, ctx):
+        if "export_declaration_doc" in ctx:
+            return ctx["export_declaration_doc"]
+
+        export_declaration_docs = self.find_all_documents("export_declaration", {}, 0, 1, "create_time")
+        if len(export_declaration_docs) == 0:
+            ctx["export_declaration_doc"] = None
+            return None
+
+        ctx["export_declaration_doc"] = export_declaration_docs[0]
+        return ctx["export_declaration_doc"]
