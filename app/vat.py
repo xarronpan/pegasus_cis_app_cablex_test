@@ -80,12 +80,13 @@ class Application(base.Application):
                 continue
 
             qty_and_unit = ol["extentions"]["qty_and_unit"]
-            nums = re.findall(r"\d+(?:\.\d+)?", qty_and_unit)
 
-            for num in nums:
+            pattern = r'(\d+(?:\.\d+)?)\s*([^\d\s]+)'
+            matches = re.findall(pattern, qty_and_unit)
+
+            for num, num_unit in matches:
                 if abs(float(num) - quantity == 0):
-                    num_pos = qty_and_unit.find(num)
-                    if qty_and_unit.find(unit, num_pos + len(num)) != -1:
+                    if unit.strip() == num_unit.strip():
                         found = True
                         break
 
