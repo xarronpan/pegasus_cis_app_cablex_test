@@ -67,6 +67,7 @@ class Application(base.Application):
         unit = order_line["extentions"]["unit"]
         doc_content = self.get_export_declaration_doc_content_with_cache(ctx, doc["email_id"], doc["filename"], doc["sheet"])
 
+        found = False
         for ol in doc_content["order_lines"]:
             if "checked" in ol:
                 continue
@@ -83,7 +84,6 @@ class Application(base.Application):
             qty_and_unit = ol["extentions"]["qty_and_unit"]
             nums = re.findall(r"\d+(?:\.\d+)?", qty_and_unit)
 
-            found = False
             for num in nums:
                 if abs(float(num) - quantity == 0):
                     num_pos = qty_and_unit.find(num)
@@ -91,16 +91,20 @@ class Application(base.Application):
                         found = True
                         break
 
-            if not found:
-                continue
+            if found:
+                ol["checked"] = True
+                break
 
-            ol["checked"] = True
+        if found:
+            return result, text
 
-        if result == "error":
-            pre_entry_number = doc_content["header"]["extentions"]["pre_entry_number"]
-            text += f"报关单中找不到对应行, 报关单预录入编码: {pre_entry_number}\n"
+        if result == "succ":
+            text = ""
 
-        return "error", result
+        pre_entry_number = doc_content["header"]["extentions"]["pre_entry_number"]
+        text += f"报关单中找不到对应行, 报关单预录入编码: {pre_entry_number}\n"
+
+        return "error", text
 
     def find_export_declaration_doc_with_cache(self, ctx):
         key = "export_declaration_doc"
