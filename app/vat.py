@@ -61,8 +61,8 @@ class Application(base.Application):
         if doc is None:
             return result, text
 
-        product_name = re.sub(r'^\*.*?\*', '', order_line["product_id"])
-        specification = order_line["extentions"]["specification"]
+        product_name = self.normalize_text(re.sub(r'^\*.*?\*', '', order_line["product_id"]))
+        specification = self.normalize_text(order_line["extentions"]["specification"])
         quantity = order_line["quantity"]
         unit = order_line["extentions"]["unit"]
         doc_content = self.get_export_declaration_doc_content_with_cache(ctx, doc["email_id"], doc["filename"], doc["sheet"])
@@ -72,13 +72,12 @@ class Application(base.Application):
             if "checked" in ol:
                 continue
 
-            product_name_and_specification = ol["desc"]
-            product_name_pos = self.normalize_text(product_name_and_specification).find(self.normalize_text(product_name))
+            product_name_and_specification = self.normalize_text(ol["desc"])
+            product_name_pos = product_name_and_specification.find(product_name)
             if product_name_pos != 0:
                 continue
 
-            if self.normalize_text(product_name_and_specification).\
-                    find(self.normalize_text(specification), product_name_pos + len(self.normalize_text(product_name))) == -1:
+            if product_name_and_specification.find(specification, product_name_pos + len(product_name)) == -1:
                 continue
 
             qty_and_unit = ol["extentions"]["qty_and_unit"]
