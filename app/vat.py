@@ -63,7 +63,7 @@ class Application(base.Application):
         specification = self.normalize_text(order_line["extentions"]["specification"]).strip()
         specification = f"|{specification}|"
         quantity = order_line["quantity"]
-        unit = order_line["extentions"]["unit"]
+        unit = order_line["extentions"]["unit"].strip()
         doc_content = self.get_export_declaration_doc_content_with_cache(ctx, doc["email_id"], doc["filename"], doc["sheet"])
 
         found = False
