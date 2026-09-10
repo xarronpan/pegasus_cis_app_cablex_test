@@ -27,7 +27,7 @@ class Application(base.Application):
             diagnose["buyer_name"] = diagnose.get("buyer_name","") + "找不到对应的报关单\n"
             diagnose["buyer_tax_id"] = diagnose.get("buyer_tax_id","") + "找不到对应的报关单\n"
         else:
-            doc_content = self.get_document_invoice_content(doc["email_id"], doc["filename"], doc["sheet"])
+            doc_content = self.get_export_declaration_doc_content_with_cache(doc["email_id"], doc["filename"], doc["sheet"])
 
             pre_entry_number = doc_content["header"]["extentions"]["pre_entry_number"]
             if doc["status"] != "submitted":
@@ -63,13 +63,27 @@ class Application(base.Application):
         return "succ", ""
 
     def find_export_declaration_doc_with_cache(self, ctx):
-        if "export_declaration_doc" in ctx:
-            return ctx["export_declaration_doc"]
+        key = "export_declaration_doc"
+        if key in ctx:
+            return ctx[key]
 
         export_declaration_docs = self.find_all_documents("export_declaration", {}, 0, 1, "create_time")
         if len(export_declaration_docs) == 0:
-            ctx["export_declaration_doc"] = None
+            ctx[key] = None
             return None
 
-        ctx["export_declaration_doc"] = export_declaration_docs[0]
-        return ctx["export_declaration_doc"]
+        ctx[key] = export_declaration_docs[0]
+        return ctx[key]
+
+    def get_export_declaration_doc_content_with_cache(self, ctx, email_id, filename, sheet):
+        key = f"export_declaration_doc_content_{email_id}_{filename}_{sheet}"
+        if key in ctx:
+            return ctx[key]
+
+        doc_content = self.get_document_invoice_content(email_id, filename, sheet)
+        if doc_content is None:
+            ctx[key] = None
+            return None
+
+        ctx[key] = doc_content
+        return ctx[key]
