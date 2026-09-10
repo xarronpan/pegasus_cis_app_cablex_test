@@ -13,9 +13,7 @@ class Application(base.Application):
 
     def normalize_text(self, orgin_text):
         normalized = unicodedata.normalize("NFKC", orgin_text)
-        for c in [" "]:
-            normalized = normalized.replace(c, "")
-
+        normalized = re.sub(r"\s+", " ", normalized)
         return normalized
 
     def check_header(self, ctx: dict, header: types.Header, order_lines: list[types.OrderLine], options: str) \
@@ -61,8 +59,8 @@ class Application(base.Application):
         if doc is None or doc["status"] != "submitted":
             return result, text
 
-        product_name = self.normalize_text(re.sub(r'^\*.*?\*', '', order_line["product_id"]))
-        specification = self.normalize_text(order_line["extentions"]["specification"])
+        product_name = self.normalize_text(re.sub(r'^\*.*?\*', '', order_line["product_id"])).strip()
+        specification = self.normalize_text(order_line["extentions"]["specification"]).strip()
         specification = f"|{specification}|"
         quantity = order_line["quantity"]
         unit = order_line["extentions"]["unit"]
@@ -74,7 +72,7 @@ class Application(base.Application):
                 continue
 
             product_name_and_specification = self.normalize_text(ol["desc"])
-            product_name_pos = product_name_and_specification.find(product_name)
+            product_name_pos = product_name_and_specification.find(product_name + " ")
             if product_name_pos != 0:
                 continue
 
