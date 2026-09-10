@@ -67,8 +67,8 @@ class Application(base.Application):
         unit = order_line["extentions"]["unit"]
         doc_content = self.get_export_declaration_doc_content_with_cache(ctx, doc["email_id"], doc["filename"], doc["sheet"])
 
-        for ol in doc_content.order_lines:
-            if ol["checked"]:
+        for ol in doc_content["order_lines"]:
+            if "checked" in ol:
                 continue
 
             product_name_and_specification = ol["desc"]
